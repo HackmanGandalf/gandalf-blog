@@ -161,11 +161,11 @@ def show_post(post_id):
 
 @app.route("/about")
 def about():
-    return render_template("about.html")
+    return render_template("about.html", logged_in=current_user.is_authenticated)
 
 @app.route('/contact')
 def contact():
-    return render_template('contact.html')
+    return render_template('contact.html', logged_in=current_user.is_authenticated)
 
 @app.route('/form_entry', methods=['post'])
 def receive_data():
@@ -183,7 +183,7 @@ def receive_data():
             msg=f"Subject: Client from Blog\n\nName: {name}\nEmail: {email}\nPhone: {phone}\nMessage: {message}"
                     )
 
-    return render_template('success.html')
+    return render_template('success.html', logged_in=current_user.is_authenticated)
 
 @app.route("/new-post", methods=["GET", "POST"])
 @admin_only
