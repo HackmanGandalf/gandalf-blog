@@ -10,6 +10,8 @@ from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
 from flask_gravatar import Gravatar
 from functools import wraps
 import os
+import smtplib
+import request
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY")
@@ -161,11 +163,27 @@ def show_post(post_id):
 def about():
     return render_template("about.html")
 
-
-@app.route("/contact")
+@app.route('/contact')
 def contact():
-    return render_template("contact.html")
+    return render_template('contact.html')
 
+@app.route('/form_entry', methods=['post'])
+def receive_data():
+    name = request.form['name']
+    email = request.form['email']
+    phone = request.form['phone']
+    message = request.form['message']
+
+    with smtplib.SMTP("smtp.gmail.com") as connection:
+        connection.starttls()
+        connection.login(user=os.environ.get("from_email"), password=os.environ.get("password"))
+        connection.sendmail(
+            from_addr=os.environ.get("from_email"),
+            to_addrs=os.environ.get("to_email"),
+            msg=f"Subject: Client from Blog\n\nName: {name}\nEmail: {email}\nPhone: {phone}\nMessage: {message}"
+                    )
+
+    return render_template('success.html')
 
 @app.route("/new-post", methods=["GET", "POST"])
 @admin_only
